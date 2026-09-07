@@ -1,1 +1,1 @@
-This is a simple recipe generator with internals inspired by a format I saw. It is built for fun, and while the methods of combining any two ingredients should be mostly correct, don't trust its flavor advice!
+This is a simple recipe generator with internals inspired by a format I saw. It is built for fun, and while the methods of combining any two ingredients should be mostly correct, don't trust its flavor advice! Website here: https://nathaniel-burke.github.io/recipe-generator/
