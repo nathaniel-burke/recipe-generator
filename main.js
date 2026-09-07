@@ -1,27 +1,6 @@
-class Flavor {
-    constructor(sweet, sour, salty, bitter, umami, heat, cooked, floral) {
-        this.properties = {
-            sweet,
-            sour,
-            salty,
-            bitter,
-            umami,
-            heat,
-            cooked,
-            floral
-        };
-    }
-    static combine(flavors = []) {
-        const combined = new Flavor(0, 0, 0, 0, 0, 0, 0, 0);
-        for (let flavor of flavors) {
-            for (let [key, value] of Object.entries(flavor.properties)) {
-                if (!combined.properties[key]) {
-                    combined.properties[key] = 0;
-                }
-                combined.properties[key] += value;
-            }
-        }
-        return combined;
+class Requirement {
+    constructor() {
+       
     }
 }
 
@@ -47,12 +26,24 @@ class Category {
     }
 }
 
+class Property {
+    static Mass = (num)=> new Property('mass', num);
+    static Volume = (num)=> new Property('volume', num);
+    static Liquidness = (num)=> new Property('liquidness', num);
+    constructor(name, value = 0) {
+        this.name = name;
+        this.value = value;
+    }
+    valueOf() {
+        return this.value;
+    }
+}
+
 class Profile {
-    constructor(mass, volume, liquidness, flavor, category) {
-        this.mass = mass; //in grams
-        this.volume = volume; //in liters
-        this.liquidness = liquidness; //ratio of liquid to total mass
-        this.flavor = flavor;
+    constructor(mass, volume, liquidness, category) {
+        this.mass = Property.Mass(mass); //in grams
+        this.volume = Property.Volume(volume); //in liters
+        this.liquidness = Property.Liquidness(liquidness); //ratio of liquid to total mass
         this.category = category;
     }
 }
@@ -65,16 +56,17 @@ class Item {
     }
     getProfile() {
         let mass = 0, volume = 0, liquidness = 0;
-        let flavors, category = [];
         for (let item of this.items) {
             mass += item.profile.mass * item.quantity;
             volume += item.profile.volume * item.quantity;
             liquidness = (liquidness * (mass - item.profile.mass*item.quantity) + item.profile.liquidness * item.profile.mass * item.quantity) / mass;
-            flavors.push(item.profile.flavor);
-            category.push(...item.category);
+            for (let cat of item.profile.category) {
+                if (!category.includes(cat)) {
+                    category.push(cat);
+                }
+            }
         }
-        const flavor = Flavor.combine(flavors);
-        return new Profile(mass, volume, liquidness, flavor, category);
+        return new Profile(mass, volume, liquidness, category);
     }
 }
 
