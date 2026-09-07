@@ -1,19 +1,18 @@
-class Profile {
-    constructor(mass, volume, liquidness, flavor) {
-        this.mass = mass;
-        this.volume = volume;
-        this.liquidness = liquidness;
-        this.quantity = quantity;
-        this.flavor = flavor;
-    }
-}
-
 class Flavor {
-    constructor() {
-        this.properties = {};
+    constructor(sweet, sour, salty, bitter, umami, heat, cooked, floral) {
+        this.properties = {
+            sweet,
+            sour,
+            salty,
+            bitter,
+            umami,
+            heat,
+            cooked,
+            floral
+        };
     }
     static combine(flavors = []) {
-        const combined = new Flavor();
+        const combined = new Flavor(0, 0, 0, 0, 0, 0, 0, 0);
         for (let flavor of flavors) {
             for (let [key, value] of Object.entries(flavor.properties)) {
                 if (!combined.properties[key]) {
@@ -26,19 +25,65 @@ class Flavor {
     }
 }
 
-class Combination {
-    constructor(ingredients){
-        this.ingredients = ingredients;
-        this.profile = this.combineProfiles();
+class Action {
+    constructor(name, description = '', requirements = []) {
+        this.name = name;
+        this.description = description;
+        this.requirements = requirements;
     }
-    combineProfiles() {
-        let mass = 0, volume = 0, liquidness = 0, quantity = 0;
-        for (let ingredient of this.ingredients) {
-            mass += ingredient.mass;
-            volume += ingredient.volume;
-            liquidness = (liquidness * (mass - ingredient.mass) + ingredient.liquidness * ingredient.mass) / mass;
+}
+
+class Category {
+    static Meat = new Category('meat', []);
+    static Vegetable = new Category('vegetable', []);
+    static Dairy = new Category('dairy', []);
+    static Fruit = new Category('fruit', []);
+    static Grain = new Category('grain', []);
+    static Seasoning = new Category('seasoning', []);
+    static Sauce = new Category('sauce', []);
+    constructor(name, actions) {
+        this.name = name;
+        this.actions = actions;
+    }
+}
+
+class Profile {
+    constructor(mass, volume, liquidness, flavor, category) {
+        this.mass = mass; //in grams
+        this.volume = volume; //in liters
+        this.liquidness = liquidness; //ratio of liquid to total mass
+        this.flavor = flavor;
+        this.category = category;
+    }
+}
+
+class Item {
+    constructor(items = [], quantity = 1){
+        this.items = items;
+        this.profile = this.getProfile();
+        this.quantity = quantity;
+    }
+    getProfile() {
+        let mass = 0, volume = 0, liquidness = 0;
+        let flavors, category = [];
+        for (let item of this.items) {
+            mass += item.profile.mass * item.quantity;
+            volume += item.profile.volume * item.quantity;
+            liquidness = (liquidness * (mass - item.profile.mass*item.quantity) + item.profile.liquidness * item.profile.mass * item.quantity) / mass;
+            flavors.push(item.profile.flavor);
+            category.push(...item.category);
         }
-        flavor = Flavor.combine();
-        return new Profile(mass, volume, liquidness, unity, flavor);
+        const flavor = Flavor.combine(flavors);
+        return new Profile(mass, volume, liquidness, flavor, category);
     }
+}
+
+class Recipe {
+    constructor(profile) {
+        this.profile = profile;
+    }
+}
+
+class RecipeGenerator {
+
 }
