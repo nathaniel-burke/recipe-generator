@@ -1,15 +1,45 @@
-class Item {
-    constructor(ingredient, quantity = 1) {
-        this.ingredient = ingredient;
-        this.quantity = quantity;
-        this.profile = ingredient.profile;
+class Step{
+    constructor({main=null, secondary=[], action=null}={}){
+        this.main = null;
+        this.secondary = [];
+        this.action = null;
+        this.add({action: action, main: main, secondary: secondary});
+    }
+    add({action = this.action, main = this.main, secondary = this.secondary} = {}) {
+        if (action.canApply({main, secondary})) {
+            this.action = action;
+            this.main = main;
+            this.secondary = secondary;
+        } else {
+            if (main!=null){
+                this.main = main;
+                return this;
+            }
+            if (action!=null){
+                this.action = action;
+                return this;
+            }
+            this.secondary = secondary;
+        }
+    }
+    execute(){
+        return this.action.execute(this.main, this.secondary);
+    }
+    getItemRequirements(){
+        return this.action.requirements;
+    }
+    isComplete(){
+        return this.action.execute(this.main,this.secondary)!=null;
     }
 }
 
 class Recipe {
-    constructor(items=[], actions=[]) {
-        this.items = items;
-        this.actions = actions;
+    constructor({steps = [], servings=1} = {}) {
+        this.steps = steps;
+        this.servings = servings;
+    }
+    add(step) {
+        this.steps.push(step);
     }
 }
 
